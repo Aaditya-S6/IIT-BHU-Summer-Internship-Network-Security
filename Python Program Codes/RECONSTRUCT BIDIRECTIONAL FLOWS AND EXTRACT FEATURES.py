@@ -46,17 +46,17 @@ def process_pcap(pcap_file, output_file):
             else:
                 payload_ratio = sent_payload_length / (recv_payload_length+1)
                 
-            writer.writerow(["YouTube", payload_ratio,Socket])
+            writer.writerow(["Imgur", payload_ratio,Socket])
     
     print(f"Flow information stored in {output_file}.")
 
 # Usage example
-pcap_folder = "D:\IIT BHU Intership\Dataset\Mobile_Applications_Traffic (1)\Mobile_Applications_Traffic\youtube-20230531T093352Z-001\youtube"
+pcap_folder ="D:\IIT BHU Intership\Dataset\Mobile_Applications_Traffic (1)\Mobile_Applications_Traffic\imgur-20230531T091233Z-001\imgur"
 output_file = "D:\IIT BHU Intership\CSV Files\csv16.csv"
 
-with open(output_file, 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile)
-    writer.writerow(['App Name', 'Payload Ratio','Socket'])
+#with open(output_file, 'w', newline='') as csvfile:
+#    writer = csv.writer(csvfile)
+#    writer.writerow(['App Name', 'Payload Ratio','Socket'])
 
 for filename in os.listdir(pcap_folder):
     file_path = os.path.join(pcap_folder, filename)
