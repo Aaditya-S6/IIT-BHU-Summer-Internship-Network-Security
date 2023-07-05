@@ -107,7 +107,6 @@ csv_folder_path ="C:\Github repo\IIT-BHU-Summer-Internship-Network-Security\App 
 
 fetch_subfolder_names(folder_path,csv_folder_path)
         
-output_file = "D:\IIT BHU Intership\CSV Files\csv16.csv"
 
 print("Completed")
 

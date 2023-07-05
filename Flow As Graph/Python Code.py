@@ -2,6 +2,9 @@ from scapy.all import *
 import glob
 import csv
 import re
+import pandas as pd
+import networkx as nx
+import matplotlib.pyplot as plt
 
 
 def process_pcap(pcap_file,output_file,AppName):
@@ -44,34 +47,55 @@ def process_pcap(pcap_file,output_file,AppName):
             else:
                 flows[flow_key] = [packet]
 
-    with open(output_file, 'a', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        i=0
-        for flow_key, flow_packets in flows.items():
-             print(type(flow_key))
-             result = flow_key.rsplit('-', 1)[-1]
-             
-             if result == "6":
-                  sent_payload_length = sum(len(str(p[TCP].payload)) for p in flow_packets )
-                  recv_payload_length = sum(len(str(p[TCP].payload)) for p in flow_packets if p[IP].src == flow_key[0])  
-             elif result=="7":
-                  sent_payload_length = sum(len(str(p[UDP].payload)) for p in flow_packets )
-                  recv_payload_length = sum(len(str(p[UDP].payload)) for p in flow_packets if p[IP].src == flow_key[0])   
+   
+    idx=0
+    L=list(flows.keys())
+    G = nx.Graph()
+    Prev_Flow_key=L[0]
+    for flow_key, flow_packets in flows.items():
+        if Prev_Flow_key!=flow_key:
+            idx=0
+            
+            G.clear()
+            
+        result = flow_key.rsplit('-', 1)[-1]
+        if result == "6":
+            sent_payload_length = sum(len(str(p[TCP].payload)) for p in flow_packets )
+            recv_payload_length = sum(len(str(p[TCP].payload)) for p in flow_packets if p[IP].src == flow_key[0])
+             window_size = packet[TCP].window
+        elif result=="7":
+            sent_payload_length = sum(len(str(p[UDP].payload)) for p in flow_packets )
+            recv_payload_length = sum(len(str(p[UDP].payload)) for p in flow_packets if p[IP].src == flow_key[0])
+             window_size = packet[UDP].window
 
-                 
-             dest_ip = flow_packets[0][IP].dst 
-             dest_port = flow_packets[0][IP].dport
-             Socket= f"{dest_ip}:{dest_port}"
-             i=i+1
-             print("Socket Representation:",Socket)
-            
-            
-             if recv_payload_length > 0:
-                  payload_ratio = sent_payload_length / recv_payload_length
-             else:
-                  payload_ratio = sent_payload_length / (recv_payload_length+1)
+        dest_ip = flow_packets[idx][IP].dst
+        print(dest_ip)
+        dest_port = flow_packets[idx][IP].dport
+        Socket= f"{dest_ip}:{dest_port}"
+        print("Socket Representation:",Socket)
+        if recv_payload_length > 0:
+            payload_ratio = sent_payload_length / recv_payload_length
+        else:
+            payload_ratio = sent_payload_length / (recv_payload_length+1)
+        PacketLength=len(flow_packets)
+        Bytes=bytes(packet.payload)
+        first_32_bits = flow[:4]
+        binary_string = "".join(format(byte, "08b") for byte in first_32_bits)
+        extracted_data.append(binary_string)
+        lst = [int(bit) for bit in extracted_data[0]] 
+        node_id = idx
+        idx=idx+1
+        node_features = {
+            'Length': PacketLength,
+            'Socket': Socket,
+            'window_size': window_size,
+            'Payload Bits':lst }
+        
+        G.add_node(node_id, **node_features)
+        
+        
                 
-             writer.writerow([AppName, payload_ratio,Socket]) 
+                
 
 
 
@@ -88,9 +112,6 @@ def fetch_subfolder_names(folder_path,csv_folder_path):
         CSVFileName=subfolder
         pcap_folder=subfolder_path
         output_file = os.path.join(csv_folder_path,CSVFileName)
-        with open(output_file, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['App Name','Payload Ratio','Socket']);
         for filename in os.listdir(pcap_folder):
                 file_path = os.path.join(pcap_folder, filename)
                 process_pcap(file_path, output_file,subfolder)
@@ -102,12 +123,11 @@ def fetch_subfolder_names(folder_path,csv_folder_path):
 
 # Specify the path to your folder here
 folder_path ="D:\IIT BHU Intership\Dataset\Mobile_Applications_Traffic (1)\Mobile_Applications_Traffic\DataSet All Apps"
-csv_folder_path ="C:\Github repo\IIT-BHU-Summer-Internship-Network-Security\App as Graph\CsvFolder"
+csv_folder_path ="C:\Github repo\IIT-BHU-Summer-Internship-Network-Security\Flow As Graph\CSV folder"
 
 
 fetch_subfolder_names(folder_path,csv_folder_path)
         
-output_file = "D:\IIT BHU Intership\CSV Files\csv16.csv"
 
 print("Completed")
 
