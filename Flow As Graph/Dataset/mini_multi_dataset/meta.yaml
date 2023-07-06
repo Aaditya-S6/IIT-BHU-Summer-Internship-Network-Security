@@ -1,0 +1,7 @@
+dataset_name: "mini_multi_dataset"
+edge_data:
+- file_name: "edges.csv"
+graph_data:
+  file_name: "graphs.csv"
+node_data:
+- file_name: "nodes.csv"
