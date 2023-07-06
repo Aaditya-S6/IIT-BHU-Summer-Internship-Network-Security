@@ -69,7 +69,7 @@ def process_pcap(pcap_folder,AppName,nodesPath,edgesPath,graphsPath):
                 payload_ratio = sent_payload_length / (recv_payload_length+1)
             with open(graphsPath, 'a', newline='') as csvfileG:
                 writerG = csv.writer(csvfileG)
-                writerG.writerow([gnum,payload_ratio,AppName])        
+                writerG.writerow([gnum,payload_ratio,1])        
             if result=="7" or result=="6":
                 prev_packetTime=flow_packets[0].time
                 NodeId=0
@@ -79,8 +79,8 @@ def process_pcap(pcap_folder,AppName,nodesPath,edgesPath,graphsPath):
                         window_size = Packet[TCP].window
                     elif result=="7":
                         window_size = Packet[UDP].window
-                    
-                    dest_ip = Packet[IP].dst
+                
+                    dest_ip = 1
                     dest_port =Packet[IP].dport
                     PacketLength=len(Packet)
                     Bytes=bytes(Packet.payload)
@@ -96,7 +96,7 @@ def process_pcap(pcap_folder,AppName,nodesPath,edgesPath,graphsPath):
                             #'window_size': window_size,
                             #'Payload Bits':bitsList }
                     node_features=window_size
-                    interArrivalTime=Packet.time-prev_packetTime
+                    interArrivalTime=1
                     NextNode=NodeId+1
                     if NodeId==len(flow_packets)-1:
                        NextNode=0
