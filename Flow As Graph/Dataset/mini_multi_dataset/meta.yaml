@@ -1,13 +1,9 @@
+
 dataset_name: "mini_multi_dataset"
 edge_data:
 - file_name: "edges.csv"
-  etype: [packet, time, packet]
-  src_id_field: src_id        
-  dst_id_field: dst_id 
 graph_data:
   file_name: "graphs.csv"
-  graph_id_field: graph_id       
 node_data:
 - file_name: "nodes.csv"
-  ntype: packet
-  node_id_field: node_id 
+

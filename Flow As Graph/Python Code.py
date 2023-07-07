@@ -74,7 +74,7 @@ def process_pcap(pcap_folder,AppName,nodesPath,edgesPath,graphsPath):
                 prev_packetTime=flow_packets[0].time
                 NodeId=0
                 NextNode=0
-                for Packet in flow_packets[1:]:
+                for Packet in flow_packets:
                     if result == "6":
                         window_size = Packet[TCP].window
                     elif result=="7":
@@ -94,12 +94,16 @@ def process_pcap(pcap_folder,AppName,nodesPath,edgesPath,graphsPath):
                             #'IP': dest_ip,
                             #'Port':dest_port,
                             #'window_size': window_size,
-                            #'Payload Bits':bitsList }
+                            #'Payload Bits':bitsList 
+                    #node_feat = np.array([PacketLength,dest_ip,window_size])
                     node_features=window_size
                     interArrivalTime=1
                     NextNode=NodeId+1
-                    if NodeId==len(flow_packets)-1:
-                       NextNode=0
+                    #if NodeId==len(flow_packets)-1:
+                       #NextNode=0
+                    dstNodes=np.array([])
+                    for it in range(NodeId+1,len(flow_packets)):
+                        dstNodes=np.append(dstNodes,it)
                     with open(nodesPath, 'a', newline='') as csvfileN:
                         writerN = csv.writer(csvfileN)
                         writerN.writerow([gnum,NodeId,node_features])
@@ -126,7 +130,7 @@ def fetch_subfolder_names(folder_path,nodesPath,edgesPath,graphsPath):
 
 
 # Specify the path to your folder here
-folder_path ="D:\IIT BHU Intership\Dataset\Mobile_Applications_Traffic (1)\Mobile_Applications_Traffic\DataSet All Apps"
+folder_path =r"D:\IIT BHU Intership\Dataset\Mobile_Applications_Traffic (1)\Mobile_Applications_Traffic\DataSet All Apps"
 nodesPath=r"C:\Github repo\IIT-BHU-Summer-Internship-Network-Security\Flow As Graph\Dataset\mini_multi_dataset\nodes.csv"
 edgesPath=r"C:\Github repo\IIT-BHU-Summer-Internship-Network-Security\Flow As Graph\Dataset\mini_multi_dataset\edges.csv"
 graphsPath=r"C:\Github repo\IIT-BHU-Summer-Internship-Network-Security\Flow As Graph\Dataset\mini_multi_dataset\graphs.csv"
