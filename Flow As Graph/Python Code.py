@@ -78,7 +78,7 @@ def process_pcap(pcap_folder,AppName,graphsPath):
                     flows[flow_key] = [packet]
         print(len(flows.keys()))
         for flow_key, flow_packets in flows.items():
-            if(len(flow_packets)>100):
+            if(len(flow_packets)>200):
                 continue
             global gnum
             Arithmetic_mean=0
@@ -133,16 +133,29 @@ def process_pcap(pcap_folder,AppName,graphsPath):
             NpArray=np.array(interarrival_timesList)
             StandardDeviation=np.std(NpArray)
             Variance=np.var(NpArray)
+            Arithmetic_mean=np.mean(NpArray)
+            if(StandardDeviation==0 and Variance==0 and Arithmetic_mean==0):
+                continue
+            
             edge_attr=[]
-            print(type([SourceEdgeIndex,DstEdgeIndex]))
+            PacketLen=[]
+            for i in range(len(flow_packets)):
+                PacketLen.append(len(flow_packets[i]))
+            NPArrayPacket=np.array(PacketLen)
+            MeanLength=np.mean(NPArrayPacket)
+            NodeFeatures=[]
+            dest_ip = flow_packets[0][IP].dst 
+            dest_port = flow_packets[0][IP].dport
+            Socket= f"{dest_ip}:{dest_port}"
+
+            flowDuration=abs(flow_packets[len(flow_packets)-1].time-flow_packets[0].time)
+            for i in range(len(flow_packets)):
+                NodeFeatures.append([int(payload_ratio),Socket,len(flow_packets[i])])
             for i in range(len(SourceEdgeIndex)):
-                edge_attr.append([int(Arithmetic_mean),int(StandardDeviation),int(Variance)])
-            FlowInstance=flowData([SourceEdgeIndex,DstEdgeIndex],edge_attr,[LabelNum],len(flow_packets),[int(payload_ratio)])
+                edge_attr.append([int(Arithmetic_mean),int(abs(flow_packets[SourceEdgeIndex[i]].time-flow_packets[DstEdgeIndex[i]].time)),int(MeanLength)])
+            FlowInstance=flowData([SourceEdgeIndex,DstEdgeIndex],edge_attr,[LabelNum],len(flow_packets),NodeFeatures)
             with open(graphsPath,"a") as f:
-                json.dump(FlowInstance.__dict__,f)
-            # with open(graphsPath, 'a', newline='') as csvfileG:
-            #     writerG = csv.writer(csvfileG)
-            #     writerG.writerow([[SourceEdgeIndex,DstEdgeIndex],edge_attr,[LabelNum],len(flow_packets),[int(payload_ratio)]])  
+                json.dump(FlowInstance.__dict__,f) 
                         
             gnum+=1
             print("One flow of",AppName,"Done")
@@ -165,11 +178,9 @@ def fetch_subfolder_names(folder_path,graphsPath):
 # Specify the path to your folder here
 folder_path =r"D:\IIT BHU Intership\Dataset\Mobile_Applications_Traffic (1)\Mobile_Applications_Traffic\DataSet All Apps"
 
-graphsPath=r"C:\Github repo\IIT-BHU-Summer-Internship-Network-Security\Flow As Graph\Dataset\graphs.csv"
+graphsPath=r"C:\Github repo\IIT-BHU-Summer-Internship-Network-Security\Flow As Graph\Dataset\graphs.json"
 
-# with open(graphsPath, 'w', newline='') as csv_fileG:
-#     writer = csv.writer(csv_fileG)
-#     writer.writerow(["edge_index (sequence)","edge_attr (sequence)","y (sequence)","num_nodes (int64)","node_feat (sequence)"])
+
 
 
 
