@@ -1,1 +1,0 @@
-edge_index (sequence),edge_attr (sequence),y (sequence),num_nodes (int64),node_feat (sequence)
