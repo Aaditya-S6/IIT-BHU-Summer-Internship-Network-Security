@@ -144,13 +144,13 @@ def process_pcap(pcap_folder,AppName,graphsPath):
             NPArrayPacket=np.array(PacketLen)
             MeanLength=np.mean(NPArrayPacket)
             NodeFeatures=[]
-            dest_ip = flow_packets[0][IP].dst 
+            #dest_ip = flow_packets[0][IP].dst 
             dest_port = flow_packets[0][IP].dport
-            Socket= f"{dest_ip}:{dest_port}"
+            #Socket= f"{dest_ip}:{dest_port}"
 
             flowDuration=abs(flow_packets[len(flow_packets)-1].time-flow_packets[0].time)
             for i in range(len(flow_packets)):
-                NodeFeatures.append([int(payload_ratio),Socket,len(flow_packets[i])])
+                NodeFeatures.append([int(payload_ratio),dst_port,len(flow_packets[i])])
             for i in range(len(SourceEdgeIndex)):
                 edge_attr.append([int(Arithmetic_mean),int(abs(flow_packets[SourceEdgeIndex[i]].time-flow_packets[DstEdgeIndex[i]].time)),int(MeanLength)])
             FlowInstance=flowData([SourceEdgeIndex,DstEdgeIndex],edge_attr,[LabelNum],len(flow_packets),NodeFeatures)
