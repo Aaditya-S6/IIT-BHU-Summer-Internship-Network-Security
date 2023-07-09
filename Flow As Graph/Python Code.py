@@ -76,9 +76,8 @@ def process_pcap(pcap_folder,AppName,graphsPath):
                 
                 else:
                     flows[flow_key] = [packet]
-        print(len(flows.keys()))
         for flow_key, flow_packets in flows.items():
-            if(len(flow_packets)>200):
+            if(len(flow_packets)>50):
                 continue
             global gnum
             Arithmetic_mean=0
@@ -150,7 +149,7 @@ def process_pcap(pcap_folder,AppName,graphsPath):
 
             flowDuration=abs(flow_packets[len(flow_packets)-1].time-flow_packets[0].time)
             for i in range(len(flow_packets)):
-                NodeFeatures.append([int(payload_ratio),dst_port,len(flow_packets[i])])
+                NodeFeatures.append([int(payload_ratio),dst_port,len(flow_packets[i]),int(StandardDeviation),int(Variance),int(payload_ratio),dst_port,len(flow_packets[i]),int(StandardDeviation)])
             for i in range(len(SourceEdgeIndex)):
                 edge_attr.append([int(Arithmetic_mean),int(abs(flow_packets[SourceEdgeIndex[i]].time-flow_packets[DstEdgeIndex[i]].time)),int(MeanLength)])
             FlowInstance=flowData([SourceEdgeIndex,DstEdgeIndex],edge_attr,[LabelNum],len(flow_packets),NodeFeatures)
